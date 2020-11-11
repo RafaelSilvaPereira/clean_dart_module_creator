@@ -114,7 +114,7 @@ $classPrefix $_className $supClass {
       String fullClassName, ClassBuilder dependency) {
     if (!isInterface && validDepency) {
       properties =
-          'final $fullClassName ${dependency.className[0].toLowerCase() + dependency.className.substring(1)};';
+          'final I$fullClassName ${dependency.className[0].toLowerCase() + dependency.className.substring(1)};';
     } else {
       properties = '';
     }
