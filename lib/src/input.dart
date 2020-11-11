@@ -20,7 +20,7 @@ extension toOtherCases on String {
   }
 }
 
-void main(List<String> arguments) {
+void execMain(List<String> arguments) {
   //print('Hello world: ${create_modules_cli.calculate()}!');
   final parser = ArgParser()
     ..addOption(MODULE, abbr: 'm')
