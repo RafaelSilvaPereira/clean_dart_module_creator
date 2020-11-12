@@ -4,6 +4,7 @@ import 'package:meta/meta.dart';
 
 import 'class_builder.dart';
 
+///  generate a util methods to get snakeCase and PascalCase from a String
 extension toOtherCases on String {
   String get toSnakeCase {
     return this.trim().toLowerCase().split(' ').join('_');
@@ -17,10 +18,18 @@ extension toOtherCases on String {
   }
 }
 
+/// this class represents a folder into a module
 class ModuleFolderGen {
+  /// [level] represents how much nested a folder it is
   final int level;
+
+  /// [name] is the name of the folder
   final String name;
+
+  /// [parent] is a folder where this nested
   final ModuleFolderGen parent;
+
+  /// [moduleNameInSnackCase] is a global name of module
   final String moduleNameInSnackCase;
   ModuleFolderGen({
     @required this.level,
@@ -29,8 +38,13 @@ class ModuleFolderGen {
     @required this.moduleNameInSnackCase,
   });
 
+  /// [separator] returns a '/' or '\\' depending of the current SO file system
   String get separator => Directory.current.path.contains('/') ? '/' : '\\';
-  String get exportName => '$name';
+
+  /// [exportName] return a name to export file of moduleFolder
+  String get exportName => '$name/$name.exports.dart';
+
+  /// [path] returun the current path of module folder
   String get path {
     final oldPath = '${(parent?.path ?? Directory.current.path)}';
     final newPath = name != null ? '$separator$name' : '';
@@ -38,6 +52,7 @@ class ModuleFolderGen {
     return '$oldPath$newPath';
   }
 
+  /// [imports] generates a import content to files into this folder
   String get imports {
     String numberOfBars = '';
     for (var i = 0; i < this.level; i++) {
@@ -64,11 +79,10 @@ class ModuleFolderGen {
     return 'ModuleFolderGen(level: $level, name: $name, parent: $parent, moduleNameInSnackCase: $moduleNameInSnackCase, path: $path)';
   }
 
+  /// [generateExportFile] make a export file to this folder
   FileBuilder generateExportFile(List<String> filesNames) {
-    final content = filesNames.fold<String>(
-        '',
-        (previousValue, element) =>
-            '''$previousValue\nexport '$element/$element.exports.dart';''');
+    final content = filesNames.fold<String>('',
+        (previousValue, element) => '''$previousValue\nexport '$element';''');
     return FileBuilder(
       '$name',
       path,
@@ -182,63 +196,6 @@ generateCode(
     parent: infraFolder,
   );
 
-  final messageImportEmpty = '... type here';
-  final entityExport = entitiesFolder.generateExportFile([messageImportEmpty]);
-  final modelsExport = modelsFolder.generateExportFile([messageImportEmpty]);
-  final usecasesExport =
-      usecasesFolder.generateExportFile([messageImportEmpty]);
-  
-  final interfaceExport =
-      interfaceFolder.generateExportFile([messageImportEmpty]);
-  final protocolExport =
-      protocolsFolder.generateExportFile([messageImportEmpty]);
-  final connectorExport =
-      connectorsFolder.generateExportFile([messageImportEmpty]);
-  final datasourcesExport =
-      datasourcesFolder.generateExportFile([messageImportEmpty]);
-  final driverExport = driversFolder.generateExportFile([messageImportEmpty]);
-
-  final moduleExport = moduleFolder.generateExportFile([
-    mainFolder.exportName,
-    adpterFolder.exportName,
-    infraFolder.exportName,
-  ]);
-  final mainExport = mainFolder.generateExportFile([
-    domainFolder.exportName,
-    usecasesFolder.exportName,
-    interfaceFolder.exportName,
-    protocolsFolder.exportName,
-  ]);
-  final domainExport = domainFolder.generateExportFile([
-    modelsFolder.exportName,
-    entitiesFolder.exportName,
-  ]);
-
-  final adpterExport = adpterFolder.generateExportFile([
-    connectorsFolder.exportName,
-    driversFolder.exportName,
-  ]);
-
-  final infraExport = infraFolder.generateExportFile([
-    datasourcesFolder.exportName,
-  ]);
-
-  final List<FileBuilder> exportsFiles = [
-    entityExport,
-    modelsExport,
-    usecasesExport,
-    interfaceExport,
-    protocolExport,
-    connectorExport,
-    datasourcesExport,
-    driverExport,
-    moduleExport,
-    mainExport,
-    domainExport,
-    adpterExport,
-    infraExport,
-  ];
-
   final List<ModuleFolderGen> folders = [
     moduleFolder,
     facadeFolder,
@@ -290,11 +247,95 @@ generateCode(
     ));
   }
 
-  final classes = [...dataClasses, ...utilClasses];
+  final classes = {'dataClasses': dataClasses, 'utilClasses': utilClasses};
 
-  for (ClassBuilder classe in classes) {
+  final entitiesFileNames = <String>[];
+  final modelsFileNames = <String>[];
+  final protocolsFileNames = <String>[];
+  final driversFileNames = <String>[];
+  final usecasesFileNames = <String>[];
+  final connectorsFileNames = <String>[];
+  final datasourcesFileNames = <String>[];
+  final interfacesFileNames = <String>[];
+
+  for (ClassBuilder classe in classes['dataClasses']) {
+    if (classe.fileName.contains('entity'))
+      entitiesFileNames.add(classe.fileName);
+    else if (classe.fileName.contains('models'))
+      modelsFileNames.add(classe.fileName);
     createFile(classe.filePath, classe.fileName, classe.toString());
   }
+
+  for (ClassBuilder classe in classes['utilClasses']) {
+    if (classe.fileName.contains('protocol'))
+      protocolsFileNames.add(classe.fileName);
+    else if (classe.fileName.contains('usecase'))
+      usecasesFileNames.add(classe.fileName);
+    else if (classe.fileName.contains('driver'))
+      driversFileNames.add(classe.fileName);
+    else if (classe.fileName.contains('connector'))
+      connectorsFileNames.add(classe.fileName);
+    else if (classe.fileName.contains('datasource'))
+      datasourcesFileNames.add(classe.fileName);
+    else if (classe.fileName.contains('interface'))
+      interfacesFileNames.add(classe.fileName);
+
+    createFile(classe.filePath, classe.fileName, classe.toString());
+  }
+
+  final entityExport = entitiesFolder.generateExportFile(entitiesFileNames);
+  final modelsExport = modelsFolder.generateExportFile(modelsFileNames);
+  final usecasesExport = usecasesFolder.generateExportFile(usecasesFileNames);
+
+  final interfaceExport =
+      interfaceFolder.generateExportFile(interfacesFileNames);
+  final protocolExport = protocolsFolder.generateExportFile(protocolsFileNames);
+  final connectorExport =
+      connectorsFolder.generateExportFile(connectorsFileNames);
+  final datasourcesExport =
+      datasourcesFolder.generateExportFile(datasourcesFileNames);
+  final driverExport = driversFolder.generateExportFile(driversFileNames);
+
+  final moduleExport = moduleFolder.generateExportFile([
+    mainFolder.exportName,
+    adpterFolder.exportName,
+    infraFolder.exportName,
+  ]);
+  final mainExport = mainFolder.generateExportFile([
+    domainFolder.exportName,
+    usecasesFolder.exportName,
+    interfaceFolder.exportName,
+    protocolsFolder.exportName,
+  ]);
+  final domainExport = domainFolder.generateExportFile([
+    modelsFolder.exportName,
+    entitiesFolder.exportName,
+  ]);
+
+  final adpterExport = adpterFolder.generateExportFile([
+    connectorsFolder.exportName,
+    driversFolder.exportName,
+  ]);
+
+  final infraExport = infraFolder.generateExportFile([
+    datasourcesFolder.exportName,
+  ]);
+
+  final List<FileBuilder> exportsFiles = [
+    entityExport,
+    modelsExport,
+    usecasesExport,
+    interfaceExport,
+    protocolExport,
+    connectorExport,
+    datasourcesExport,
+    driverExport,
+    moduleExport,
+    mainExport,
+    domainExport,
+    adpterExport,
+    infraExport,
+  ];
 
   for (FileBuilder fileBuilder in exportsFiles) {
     createFile(
@@ -302,6 +343,7 @@ generateCode(
   }
 }
 
+/// [createDataClasses]
 List<ClassBuilder> createDataClasses(
   String moduleNameInSnackCase,
   String dataclassName, {
@@ -347,7 +389,7 @@ List<ClassBuilder> createUtilsClasses(
   /// declare interfaces
   final usecaseInterfaces = createClasses(
     classBaseName: usecaseClasseBaseName,
-    classTerminology: 'Usecase',
+    classTerminology: 'Interface',
     isInterface: true,
     moduleFolderGen: interfaceFolder,
   );
