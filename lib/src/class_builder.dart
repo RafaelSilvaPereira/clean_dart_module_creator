@@ -76,7 +76,7 @@ class ClassBuilder {
     final content = '''\n
 
 import 'package:meta/meta.dart';
-import 'package:dartz/dartz.dart';
+
 
 import '${imports.trim()}';
 
