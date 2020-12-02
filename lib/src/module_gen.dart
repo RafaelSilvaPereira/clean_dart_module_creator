@@ -39,7 +39,7 @@ class ModuleFolderGen {
   });
 
   /// [separator] returns a '/' or '\\' depending of the current SO file system
-  String get separator => Directory.current.path.contains('/') ? '/' : '\\';
+  String get separator => Directory.current.path.contains('/') ? '/' : '/';
 
   /// [exportName] return a name to export file of moduleFolder
   String get exportName => '$name/$name.exports.dart';
