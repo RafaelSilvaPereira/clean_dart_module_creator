@@ -20,26 +20,26 @@ class FileBuilder {
 class ClassBuilder {
   final FileBuilder fileBuilder;
   final String className;
-  final ClassBuilder dependency;
-  final ClassBuilder superClass;
+  final ClassBuilder? dependency;
+  final ClassBuilder? superClass;
   final bool isInterface;
   final String imports;
 
   const ClassBuilder._({
-    @required this.fileBuilder,
-    @required this.className,
-    @required this.isInterface,
+    required this.fileBuilder,
+    required this.className,
+    required this.isInterface,
     this.superClass,
     this.dependency,
     this.imports = '',
   });
 
   factory ClassBuilder.specific({
-    @required String className,
-    @required bool isInterface,
-    @required String fileName,
-    @required String location,
-    @required String content,
+    required String className,
+    required bool isInterface,
+    required String fileName,
+    required String location,
+    required String content,
   }) {
     return ClassBuilder._(
       fileBuilder: FileBuilder(fileName, location, content),
@@ -48,12 +48,12 @@ class ClassBuilder {
     );
   }
   factory ClassBuilder({
-    @required String className,
-    @required bool isInterface,
-    @required String fileName,
-    @required String location,
-    ClassBuilder superClass,
-    ClassBuilder dependency,
+    required String className,
+    required bool isInterface,
+    required String fileName,
+    required String location,
+    ClassBuilder? superClass,
+    ClassBuilder? dependency,
     String imports = '',
   }) {
     final bool validDepency = getValidDependency(dependency);
@@ -101,7 +101,7 @@ $classPrefix $_className $supClass {
   }
 
   static String getConstructorParams(
-          ClassBuilder dependency, String fullPropertyName) =>
+          ClassBuilder? dependency, String fullPropertyName) =>
       dependency != null ? '{$fullPropertyName}' : '';
 
   static String getClassFullName(bool isInterface, String className) =>
@@ -111,10 +111,10 @@ $classPrefix $_className $supClass {
       isInterface ? 'abstract class' : 'class';
 
   static String getProperties(bool isInterface, bool validDepency, properties,
-      String fullClassName, ClassBuilder dependency) {
+      String fullClassName, ClassBuilder? dependency) {
     if (!isInterface && validDepency) {
       properties =
-          'final I$fullClassName ${dependency.className[0].toLowerCase() + dependency.className.substring(1)};';
+          'final I$fullClassName ${dependency!.className[0].toLowerCase() + dependency.className.substring(1)};';
     } else {
       properties = '';
     }
@@ -122,18 +122,18 @@ $classPrefix $_className $supClass {
   }
 
   static String getFullProptertyName(
-      bool validDepency, ClassBuilder dependency) {
+      bool validDepency, ClassBuilder? dependency) {
     return validDepency
         ? '@required this.' +
-            dependency.className[0].toLowerCase() +
+            dependency!.className[0].toLowerCase() +
             dependency.className.substring(1)
         : '';
   }
 
-  static String getFullClassName(bool validDepency, ClassBuilder dependency) =>
-      validDepency ? dependency.className : '';
+  static String getFullClassName(bool validDepency, ClassBuilder? dependency) =>
+      validDepency ? dependency!.className : '';
 
-  static bool getValidDependency(ClassBuilder dependency) {
+  static bool getValidDependency(ClassBuilder? dependency) {
     return dependency != null && dependency.className.length > 0;
   }
 

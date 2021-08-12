@@ -27,15 +27,15 @@ class ModuleFolderGen {
   final String name;
 
   /// [parent] is a folder where this nested
-  final ModuleFolderGen parent;
+  final ModuleFolderGen? parent;
 
   /// [moduleNameInSnackCase] is a global name of module
   final String moduleNameInSnackCase;
   ModuleFolderGen({
-    @required this.level,
-    @required this.name,
-    @required this.parent,
-    @required this.moduleNameInSnackCase,
+    required this.level,
+    required this.name,
+    required this.parent,
+    required this.moduleNameInSnackCase,
   });
 
   /// [separator] returns a '/' or '\\' depending of the current SO file system
@@ -258,7 +258,7 @@ generateCode(
   final datasourcesFileNames = <String>[];
   final interfacesFileNames = <String>[];
 
-  for (ClassBuilder classe in classes['dataClasses']) {
+  for (ClassBuilder classe in classes['dataClasses'] as Iterable<ClassBuilder>) {
     if (classe.fileName.contains('entity'))
       entitiesFileNames.add(classe.fileName);
     else if (classe.fileName.contains('models'))
@@ -266,7 +266,7 @@ generateCode(
     createFile(classe.filePath, classe.fileName, classe.toString());
   }
 
-  for (ClassBuilder classe in classes['utilClasses']) {
+  for (ClassBuilder classe in classes['utilClasses'] as Iterable<ClassBuilder>) {
     if (classe.fileName.contains('protocol'))
       protocolsFileNames.add(classe.fileName);
     else if (classe.fileName.contains('usecase'))
@@ -347,8 +347,8 @@ generateCode(
 List<ClassBuilder> createDataClasses(
   String moduleNameInSnackCase,
   String dataclassName, {
-  @required ModuleFolderGen modelsFolder,
-  @required ModuleFolderGen entitiesFolder,
+  required ModuleFolderGen modelsFolder,
+  required ModuleFolderGen entitiesFolder,
 }) {
   final entity = createClasses(
     classBaseName: dataclassName,
@@ -371,13 +371,13 @@ List<ClassBuilder> createDataClasses(
 List<ClassBuilder> createUtilsClasses(
   String moduleNameInSnackCase,
   String usecaseClasseBaseName, {
-  @required ModuleFolderGen facadeFolder,
-  @required ModuleFolderGen interfaceFolder,
-  @required ModuleFolderGen protocolsFolder,
-  @required ModuleFolderGen driversFolder,
-  @required ModuleFolderGen usecasesFolder,
-  @required ModuleFolderGen connectorsFolder,
-  @required ModuleFolderGen datasourcesFolder,
+  required ModuleFolderGen facadeFolder,
+  required ModuleFolderGen interfaceFolder,
+  required ModuleFolderGen protocolsFolder,
+  required ModuleFolderGen driversFolder,
+  required ModuleFolderGen usecasesFolder,
+  required ModuleFolderGen connectorsFolder,
+  required ModuleFolderGen datasourcesFolder,
 }) {
   final facadeFile = createClasses(
     classBaseName: moduleNameInSnackCase,
@@ -450,12 +450,12 @@ List<ClassBuilder> createUtilsClasses(
 }
 
 ClassBuilder createClasses({
-  @required bool isInterface,
-  @required String classBaseName,
-  @required String classTerminology,
-  @required ModuleFolderGen moduleFolderGen,
-  ClassBuilder classDependecy,
-  ClassBuilder classExtension,
+  required bool isInterface,
+  required String classBaseName,
+  required String classTerminology,
+  required ModuleFolderGen moduleFolderGen,
+  ClassBuilder? classDependecy,
+  ClassBuilder? classExtension,
 }) {
   final classNameSnackCase = classBaseName.toSnakeCase; // classBaseName
   final classNamePascalCase = classBaseName.toPascalCase; // classBaseName

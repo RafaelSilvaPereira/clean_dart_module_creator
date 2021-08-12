@@ -86,8 +86,8 @@ void run() {
 }
 
 class FileOperation {
-  String message;
-  bool isComplete;
+  String? message;
+  bool? isComplete;
 
   FileOperation(bool isComplete, String message) {
     update(isComplete, message);
