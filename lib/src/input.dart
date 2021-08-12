@@ -75,7 +75,7 @@ FileOperation writeFile(String filePath, String fileName, String content) {
 }
 
 mkdirFolder(String path) {
-  Directory.fromUri(Uri(path: path)).createSync(recursive: true);
+  Directory(path).createSync(recursive: true);
 }
 
 // escreverArquivo(local: String, nomeArquivo: String, conteudo: String )

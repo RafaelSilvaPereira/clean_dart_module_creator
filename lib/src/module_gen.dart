@@ -1,8 +1,8 @@
 import 'dart:io';
 
-import 'package:meta/meta.dart';
-
+import 'package:path/path.dart' as p;
 import 'class_builder.dart';
+
 
 ///  generate a util methods to get snakeCase and PascalCase from a String
 extension toOtherCases on String {
@@ -215,7 +215,10 @@ generateCode(
 
   /// Write Folders
   folders.forEach((folder) {
-    createFolder(folder.path);
+
+
+    var normalize = p.normalize(folder.path);
+    createFolder(normalize);
   });
 
   final dataClasses = [];
@@ -258,7 +261,8 @@ generateCode(
   final datasourcesFileNames = <String>[];
   final interfacesFileNames = <String>[];
 
-  for (ClassBuilder classe in classes['dataClasses'] as Iterable<ClassBuilder>) {
+  final dataClasses2 = classes['dataClasses'] as List<dynamic>;
+  for (ClassBuilder classe in dataClasses2 ) {
     if (classe.fileName.contains('entity'))
       entitiesFileNames.add(classe.fileName);
     else if (classe.fileName.contains('models'))
@@ -266,7 +270,8 @@ generateCode(
     createFile(classe.filePath, classe.fileName, classe.toString());
   }
 
-  for (ClassBuilder classe in classes['utilClasses'] as Iterable<ClassBuilder>) {
+  var classe2 = classes['utilClasses'] as List<dynamic>;
+  for (ClassBuilder classe in classe2) {
     if (classe.fileName.contains('protocol'))
       protocolsFileNames.add(classe.fileName);
     else if (classe.fileName.contains('usecase'))

@@ -1,5 +1,3 @@
-import 'package:meta/meta.dart';
-
 class FileBuilder {
   final String name;
   final String location;
@@ -72,11 +70,8 @@ class ClassBuilder {
         getConstructor(isInterface, _className, constructorParams);
 
     final supClass =
-        superClass != null ? 'implements ${superClass?.realClassName}' : '';
+        superClass != null ? 'implements ${superClass.realClassName}' : '';
     final content = '''\n
-
-import 'package:meta/meta.dart';
-
 
 import '${imports.trim()}';
 
@@ -124,7 +119,7 @@ $classPrefix $_className $supClass {
   static String getFullProptertyName(
       bool validDepency, ClassBuilder? dependency) {
     return validDepency
-        ? '@required this.' +
+        ? 'required this.' +
             dependency!.className[0].toLowerCase() +
             dependency.className.substring(1)
         : '';
